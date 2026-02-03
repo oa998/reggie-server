@@ -32,6 +32,7 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	implementation(platform("com.google.cloud:libraries-bom:26.72.0"))
 	implementation("com.google.cloud:google-cloud-pubsub")
+	implementation("com.google.cloud:google-cloud-storage")
 	
 	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
