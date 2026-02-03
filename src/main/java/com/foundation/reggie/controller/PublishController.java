@@ -17,7 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
+import java.util.Arrays;
 import java.util.Map;
+
+import static java.util.stream.Collectors.toMap;
 
 @RestController
 @Tag(name = "Publish", description = "Pub/Sub message publishing API")
@@ -41,12 +44,19 @@ public class PublishController {
         String jsonMessage = objectMapper.writeValueAsString(message);
         JsonNode payload = objectMapper.readTree(jsonMessage);
         String messageId = pubSubPublisher.publish(request.getTopic(), jsonMessage, request.getAttributes());
-        return ResponseEntity.ok(Map.of("messageId", messageId, "payload", payload));
+        return ResponseEntity.ok(Map.of(
+                "messageId", messageId,
+                "payload", payload,
+                message.getClass().getSimpleName(), Arrays.stream(message.getClass().getDeclaredFields())
+                        .flatMap((f) -> Map.of(f.getName(), f.getType().getSimpleName()).entrySet().stream())
+                        .collect(toMap(Map.Entry::getKey, Map.Entry::getValue))
+        ));
     }
 
     @Schema(description = "Publish response")
     record PublishResponse(
             @Schema(description = "The Pub/Sub message ID", example = "1234567890")
             String messageId
-    ) {}
+    ) {
+    }
 }
