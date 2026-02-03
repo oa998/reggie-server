@@ -55,6 +55,30 @@ public class CloudStorageService {
         return readAllFromPrefix(MESSAGE_SAMPLES_PREFIX, MessageSample.class);
     }
 
+    public void deleteScenario(String id) {
+        String blobName = SCENARIOS_PREFIX + id + ".json";
+        deleteBlob(blobName);
+    }
+
+    public void deleteMessageSample(String messageId) {
+        String blobName = MESSAGE_SAMPLES_PREFIX + messageId + ".json";
+        deleteBlob(blobName);
+    }
+
+    private void deleteBlob(String blobName) {
+        try {
+            BlobId blobId = BlobId.of(bucketName, blobName);
+            boolean deleted = storage.delete(blobId);
+            if (!deleted) {
+                throw new StorageException("Blob not found: " + blobName, null);
+            }
+        } catch (StorageException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new StorageException("Failed to delete from Cloud Storage: " + blobName, e);
+        }
+    }
+
     private void writeJson(String blobName, Object obj) {
         try {
             String json = objectMapper.writeValueAsString(obj);
