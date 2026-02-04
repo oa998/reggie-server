@@ -107,18 +107,9 @@ Upsert a scenario to Cloud Storage.
 
 Retrieve all scenarios from Cloud Storage.
 
-**Response (200 OK):**
+### DELETE /scenarios/{id}
 
-```json
-[
-  {
-    "id": "scenario-1",
-    "name": "Order Flow Test",
-    "description": "Tests the complete order creation flow",
-    "messages": [...]
-  }
-]
-```
+Delete a scenario by ID.
 
 ### PUT /message-samples
 
@@ -142,19 +133,17 @@ Upsert a message sample to Cloud Storage.
 
 Retrieve all message samples from Cloud Storage.
 
-**Response (200 OK):**
+### DELETE /message-samples/{messageId}
 
-```json
-[
-  {
-    "messageId": "sample-1",
-    "className": "OrderCreated",
-    "topic": "orders-topic",
-    "attributes": { "env": "test" },
-    "message": { "orderId": "123", "amount": 99.99 }
-  }
-]
-```
+Delete a message sample by ID.
+
+### GET /actuator/health
+
+Health check endpoint (Spring Boot Actuator).
+
+## Static Web UI
+
+Place static files in `src/main/resources/static/` to serve a web UI at the root path `/`. The app forwards `/` to `index.html` for SPA support.
 
 ## Architecture
 
@@ -163,7 +152,8 @@ src/main/java/com/foundation/reggie/
 ├── ReggieApplication.java          # Entry point
 ├── controller/
 │   ├── PublishController.java      # Pub/Sub publish endpoint
-│   └── StorageController.java      # Cloud Storage endpoints
+│   ├── StorageController.java      # Cloud Storage endpoints
+│   └── StaticWebController.java    # Static UI routing
 ├── service/
 │   ├── PubSubPublisher.java        # Pub/Sub publishing logic
 │   └── CloudStorageService.java    # Cloud Storage operations
@@ -172,7 +162,8 @@ src/main/java/com/foundation/reggie/
 ├── config/
 │   ├── MessageRegistryConfig.java  # Registry setup
 │   ├── CloudStorageConfig.java     # Storage client config
-│   └── OpenApiConfig.java          # Swagger/OpenAPI config
+│   ├── OpenApiConfig.java          # Swagger/OpenAPI config
+│   └── StaticWebConfig.java        # Static resource handling
 ├── model/
 │   ├── Scenario.java               # Scenario model
 │   ├── ScenarioMessage.java        # Message within scenario
@@ -212,6 +203,7 @@ public MessageRegistry messageRegistry(ObjectMapper objectMapper) {
 
 - Java 21
 - Spring Boot 4.0.2
+- Spring Boot Actuator (health endpoints)
 - Google Cloud Pub/Sub (v26.72.0 BOM)
 - Google Cloud Storage (v26.72.0 BOM)
 - Gradle 9.3.0
