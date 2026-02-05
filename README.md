@@ -75,9 +75,9 @@ Publish a message to a Pub/Sub topic.
 | 400  | Unknown message type or deserialization error |
 | 500  | Failed to publish to Pub/Sub |
 
-### PUT /scenarios
+### PUT /users/{userId}/scenarios
 
-Upsert a scenario to Cloud Storage.
+Upsert a scenario to Cloud Storage for a specific user.
 
 **Request:**
 
@@ -103,13 +103,17 @@ Upsert a scenario to Cloud Storage.
 
 **Response (200 OK):** Returns the saved scenario.
 
-### GET /scenarios
+### GET /users/{userId}/scenarios
 
-Retrieve all scenarios from Cloud Storage.
+Retrieve all scenarios for a specific user.
 
-### DELETE /scenarios/{id}
+### DELETE /users/{userId}/scenarios/{id}
 
-Delete a scenario by ID.
+Delete a scenario by ID for a specific user.
+
+### GET /users
+
+List all user IDs that have scenarios stored.
 
 ### PUT /message-samples
 
@@ -210,13 +214,14 @@ public MessageRegistry messageRegistry(ObjectMapper objectMapper) {
 
 ## Cloud Storage Structure
 
-Scenarios and message samples are stored as JSON blobs in Cloud Storage:
+Scenarios are stored per-user, message samples are global:
 
 ```
 bucket/
-├── scenarios/
-│   ├── {scenarioId}.json
-│   └── ...
+├── {userId}/
+│   └── scenarios/
+│       ├── {scenarioId}.json
+│       └── ...
 └── message-samples/
     ├── {messageId}.json
     └── ...

@@ -18,7 +18,7 @@ import java.util.List;
 @Service
 public class CloudStorageService {
 
-    private static final String SCENARIOS_PREFIX = "scenarios/";
+    private static final String SCENARIOS_SUFFIX = "/scenarios/";
     private static final String MESSAGE_SAMPLES_PREFIX = "message-samples/";
     private static final String JSON_CONTENT_TYPE = "application/json";
 
@@ -35,14 +35,31 @@ public class CloudStorageService {
         this.objectMapper = objectMapper;
     }
 
-    public Scenario upsertScenario(Scenario scenario) {
-        String blobName = SCENARIOS_PREFIX + scenario.getId() + ".json";
+    public Scenario upsertScenario(String userId, Scenario scenario) {
+        String blobName = userId + SCENARIOS_SUFFIX + scenario.getId() + ".json";
         writeJson(blobName, scenario);
         return scenario;
     }
 
-    public List<Scenario> getAllScenarios() {
-        return readAllFromPrefix(SCENARIOS_PREFIX, Scenario.class);
+    public List<Scenario> getAllScenarios(String userId) {
+        return readAllFromPrefix(userId + SCENARIOS_SUFFIX, Scenario.class);
+    }
+
+    public List<String> getAllUserIds() {
+        List<String> userIds = new ArrayList<>();
+        try {
+            var page = storage.list(bucketName, Storage.BlobListOption.delimiter("/"));
+            for (Blob blob : page.iterateAll()) {
+                String name = blob.getName();
+                // Skip message-samples directory
+                if (name.endsWith("/") && !name.startsWith("message-samples")) {
+                    userIds.add(name.substring(0, name.length() - 1));
+                }
+            }
+        } catch (Exception e) {
+            throw new StorageException("Failed to list user IDs from Cloud Storage", e);
+        }
+        return userIds;
     }
 
     public MessageSample upsertMessageSample(MessageSample messageSample) {
@@ -55,8 +72,8 @@ public class CloudStorageService {
         return readAllFromPrefix(MESSAGE_SAMPLES_PREFIX, MessageSample.class);
     }
 
-    public void deleteScenario(String id) {
-        String blobName = SCENARIOS_PREFIX + id + ".json";
+    public void deleteScenario(String userId, String id) {
+        String blobName = userId + SCENARIOS_SUFFIX + id + ".json";
         deleteBlob(blobName);
     }
 

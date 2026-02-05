@@ -18,14 +18,19 @@ import java.util.List;
 public class StorageController {
     private final CloudStorageService cloudStorageService;
 
-    @PutMapping("/scenarios")
-    public Scenario upsertScenario(@RequestBody Scenario scenario) {
-        return cloudStorageService.upsertScenario(scenario);
+    @PutMapping("/users/{userId}/scenarios")
+    public Scenario upsertScenario(@PathVariable String userId, @RequestBody Scenario scenario) {
+        return cloudStorageService.upsertScenario(userId, scenario);
     }
 
-    @GetMapping("/scenarios")
-    public List<Scenario> getAllScenarios() {
-        return cloudStorageService.getAllScenarios();
+    @GetMapping("/users/{userId}/scenarios")
+    public List<Scenario> getAllScenarios(@PathVariable String userId) {
+        return cloudStorageService.getAllScenarios(userId);
+    }
+
+    @GetMapping("/users")
+    public List<String> getAllUserIds() {
+        return cloudStorageService.getAllUserIds();
     }
 
     @PutMapping("/message-samples")
@@ -38,9 +43,9 @@ public class StorageController {
         return cloudStorageService.getAllMessageSamples();
     }
 
-    @DeleteMapping("/scenarios/{id}")
-    public void deleteScenario(@PathVariable String id) {
-        cloudStorageService.deleteScenario(id);
+    @DeleteMapping("/users/{userId}/scenarios/{id}")
+    public void deleteScenario(@PathVariable String userId, @PathVariable String id) {
+        cloudStorageService.deleteScenario(userId, id);
     }
 
     @DeleteMapping("/message-samples/{messageId}")
